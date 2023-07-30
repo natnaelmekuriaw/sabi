@@ -25,8 +25,7 @@ const StyledSelectButton: React.FC = () => {
       formData.append("files[]", file as RcFile);
     });
     setUploading(true);
-    // You can use any AJAX library you like
-    fetch("https://www.mocky.io/v2/5cc8019d300000980a055e76", {
+    fetch("localhost:80001", {
       method: "POST",
       body: formData,
     })
