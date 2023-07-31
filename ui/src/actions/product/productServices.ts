@@ -43,3 +43,18 @@ export const deleteProduct = async (product: ProductAttributes) => {
     return false;
   }
 };
+
+export const massStoreProducts = async (products: ProductAttributes[]) => {
+  console.log("try mass store", { massData: products });
+  try {
+    const response = await axios.post(`${BaseUrl()}/products/mass`, {
+      massData: products,
+    });
+
+    console.log("got mass store response", response);
+    return response.data;
+  } catch (error) {
+    console.log("got mass store error", `${BaseUrl()}/products/mass`, error);
+    return false;
+  }
+};

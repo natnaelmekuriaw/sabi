@@ -78,7 +78,7 @@ export const addProduct = async (req: Request, res: Response) => {
 
 export const addMultipleProduct = async (req: Request, res: Response) => {
   const data = req.body;
-  if (data.massData.length > 0) {
+  if (data?.massData?.length > 0) {
     try {
       const products = data.massData;
       const productsMass = products.map((product: ProductAttributes) =>

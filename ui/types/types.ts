@@ -6,4 +6,5 @@ export interface ProductAttributes {
   quantity: number;
   rate: number;
   amount: number;
+  operations: boolean;
 }

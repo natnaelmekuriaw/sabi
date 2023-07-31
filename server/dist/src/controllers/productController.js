@@ -94,8 +94,9 @@ const addProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.addProduct = addProduct;
 const addMultipleProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const data = req.body;
-    if (data.massData.length > 0) {
+    if (((_a = data === null || data === void 0 ? void 0 : data.massData) === null || _a === void 0 ? void 0 : _a.length) > 0) {
         try {
             const products = data.massData;
             const productsMass = products.map((product) => product_model_1.default.upsert(product));

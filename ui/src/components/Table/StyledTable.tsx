@@ -23,6 +23,7 @@ interface ProductAttributes {
   rate: number;
   quantity: number;
   amount: number;
+  operations: boolean;
 }
 
 interface TableAttributes {
@@ -123,16 +124,18 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
           console.log("here updated", newData[index]);
           const update = await updateProduct(newData[index]);
           console.log("got update table", update);
-          // setData(newData);
           if (update) {
-            setData([]);
+            setData([...newData]);
+            // setData([]);
             setEditingKey("");
             message.success("row updated successfully.");
           } else message.error("failed to update row ");
         } else {
-          newData.push(row);
-          setData(newData);
-          setEditingKey("");
+          {
+            newData.push(row);
+            setData(newData);
+            setEditingKey("");
+          }
         }
       }
     } catch (errInfo) {
@@ -184,13 +187,6 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
   };
 
   const columns = [
-    // {
-    //   title: "Id",
-    //   dataIndex: "id",
-    //   width: "5%",
-    //   hidden: true,
-    //   render: () => null,
-    // },
     {
       title: "Item No",
       dataIndex: "itemNo",
@@ -228,37 +224,43 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
         const editable = isEditing(record);
         return (
           <>
-            {editable ? (
-              <span>
-                <Typography.Link
-                  onClick={() => save(record)}
-                  style={{ marginRight: 8 }}
-                >
-                  Save
-                </Typography.Link>
-                <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-                  <a>Cancel</a>
-                </Popconfirm>
-              </span>
+            {record.operations == false ? (
+              <></>
             ) : (
               <>
-                <Typography.Link
-                  disabled={editingKey !== ""}
-                  onClick={() => edit(record)}
-                  style={{ marginRight: 8 }}
-                >
-                  Edit
-                </Typography.Link>
+                {editable ? (
+                  <span style={{ marginRight: 8 }}>
+                    <Typography.Link
+                      onClick={() => save(record)}
+                      style={{ marginRight: 8 }}
+                    >
+                      Save
+                    </Typography.Link>
+                    <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+                      <a>Cancel</a>
+                    </Popconfirm>
+                  </span>
+                ) : (
+                  <>
+                    <Typography.Link
+                      disabled={editingKey !== ""}
+                      onClick={() => edit(record)}
+                      style={{ marginRight: 8 }}
+                    >
+                      Edit
+                    </Typography.Link>
+                  </>
+                )}
+                <span>
+                  <Popconfirm
+                    title="Sure to Delete?"
+                    onConfirm={() => deleteRow(record)}
+                  >
+                    <a style={{ color: "#f87462" }}>Delete</a>
+                  </Popconfirm>
+                </span>
               </>
             )}
-            <span>
-              <Popconfirm
-                title="Sure to Delete?"
-                onConfirm={() => deleteRow(record)}
-              >
-                <a style={{ color: "#f87462" }}>Delete</a>
-              </Popconfirm>
-            </span>
           </>
         );
       },

@@ -5,7 +5,10 @@ import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
 import * as XLSX from "xlsx";
 
 import { ProductAttributes } from "../../../types/types";
-import { getProducts } from "../../actions/product/productServices";
+import {
+  getProducts,
+  massStoreProducts,
+} from "../../actions/product/productServices";
 import StyledTable from "../Table/StyledTable";
 
 const { Content } = Layout;
@@ -20,29 +23,25 @@ const contentStyle: React.CSSProperties = {
 const Product: React.FC = () => {
   const [products, setProducts] = useState<ProductAttributes[]>([]);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [massData, setMassData] = useState<ProductAttributes[]>([]);
   const [uploading, setUploading] = useState(false);
 
-  const handleUpload = () => {
-    const formData = new FormData();
-    fileList.forEach((file) => {
-      formData.append("files[]", file as RcFile);
-    });
+  const handleUpload = async () => {
     setUploading(true);
-    fetch("localhost:80001", {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then(() => {
-        setFileList([]);
-        message.success("upload successfully.");
-      })
-      .catch(() => {
-        message.error("upload failed.");
-      })
-      .finally(() => {
-        setUploading(false);
-      });
+    const massStore = await massStoreProducts(products);
+    if (massStore) {
+      message.success("rows updated successfully.");
+      const productsWithKeys: ProductAttributes[] = massStore.map(
+        (product: ProductAttributes, index: number) => ({
+          ...product,
+          key: index.toString(),
+        })
+      );
+      setProducts(productsWithKeys);
+    } else message.error("failed to update rows ");
+
+    console.log("Mass store returned", massStore);
+    setUploading(false);
   };
 
   const props: UploadProps = {
@@ -80,8 +79,27 @@ const Product: React.FC = () => {
         const workbook: XLSX.WorkBook = XLSX.read(data, { type: "array" });
         const sheetName: string = workbook.SheetNames[0];
         const worksheet: XLSX.WorkSheet = workbook.Sheets[sheetName];
-        const parsedJson: any[] = XLSX.utils.sheet_to_json(worksheet);
-        console.log("parsedJson", parsedJson);
+        let parsedJson: any[] = XLSX.utils.sheet_to_json(worksheet);
+        let massData: any[] = [];
+        parsedJson.map((item, index: number) => {
+          if (
+            item["__EMPTY"] &&
+            item["__EMPTY"] &&
+            Number.parseFloat(item["__EMPTY"])
+          ) {
+            massData.push({
+              key: index.toString(),
+              itemNo: item["__EMPTY"],
+              description: item["__EMPTY_1"],
+              quantity: item["__EMPTY_3"],
+              rate: item["__EMPTY_4"],
+              amount: item["__EMPTY_5"],
+              operations: false,
+            });
+          }
+        });
+        setMassData(massData);
+        console.log("parsedJson", parsedJson, massData);
       };
       reader.readAsArrayBuffer(file);
     } catch (error) {
@@ -111,11 +129,16 @@ const Product: React.FC = () => {
     }
   }, [fileList]);
 
+  useEffect(() => {
+    setProducts(massData);
+  }, [massData]);
+
   return (
     <>
-      <Upload {...props} accept=".xls,.xlsx">
+      <Upload {...props} accept=".xls,.xlsx" style={{ background: "red" }}>
         <Button icon={<UploadOutlined />}>Select Excel File</Button>
       </Upload>
+
       <StyledTable products={products} />
       <Content style={contentStyle}>
         {fileList.length > 0 && (
