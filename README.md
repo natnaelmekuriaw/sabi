@@ -1,4 +1,15 @@
-![Screenshot from 2023-08-01 00-30-22](https://github.com/natnaelmekuriaw/sabi/assets/45584844/c2f5553e-b5e3-4424-b0d7-bfe1588c83be)# This is a simple react app that imports excel files and store data on mysql db by making an api call![Uploading Screenshot from 2023-08-01 00-30-14.png…]()
+ This is a simple react-express app that imports excel files and store data on mysql db by making an api call.
+ Functionalites involve : 
+   get all products from db and render on table
+   import an excel file and mass store on db
+   update single row
+   delete single row
+   
+TechStack: React (Using TypeScript), Node(Using TypeScript), Mysql,Express, AntDesign, sequelize.implmented MVC architecture.
+   
+
+![Screenshot from 2023-08-01 00-30-22](https://github.com/natnaelmekuriaw/sabi/assets/45584844/c2f5553e-b5e3-4424-b0d7-bfe1588c83be)#
+![Uploading Screenshot from 2023-08-01 00-30-14.png…]()
 
 
 ![Uploading Screenshot from 2023-08-01 00-30-07.png…]()
