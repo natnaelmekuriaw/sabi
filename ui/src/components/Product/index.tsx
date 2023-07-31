@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import { Button, message, Upload, Layout } from "antd";
 import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
+import * as XLSX from "xlsx";
+
+import { ProductAttributes } from "../../../types/types";
+import { getProducts } from "../../actions/product/productServices";
 import StyledTable from "../Table/StyledTable";
 
 const { Content } = Layout;
@@ -9,13 +13,12 @@ const { Content } = Layout;
 const contentStyle: React.CSSProperties = {
   textAlign: "end",
   minHeight: 320,
-  //   padding: 25,
   lineHeight: "120px",
   color: "#fff",
-  //   backgroundColor: "#108ee9",
 };
 
-const StyledSelectButton: React.FC = () => {
+const Product: React.FC = () => {
+  const [products, setProducts] = useState<ProductAttributes[]>([]);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploading, setUploading] = useState(false);
 
@@ -57,12 +60,63 @@ const StyledSelectButton: React.FC = () => {
     fileList,
   };
 
+  const parseExcel = (fileList: UploadFile[]): void => {
+    try {
+      if (fileList.length === 0) {
+        console.error("No file selected");
+        return;
+      }
+
+      const file = fileList[0] as RcFile;
+      if (!file) {
+        alert("Invalid file");
+        console.error("Invalid file check your file");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        const data = event.target?.result as ArrayBuffer;
+        const workbook: XLSX.WorkBook = XLSX.read(data, { type: "array" });
+        const sheetName: string = workbook.SheetNames[0];
+        const worksheet: XLSX.WorkSheet = workbook.Sheets[sheetName];
+        const parsedJson: any[] = XLSX.utils.sheet_to_json(worksheet);
+        console.log("parsedJson", parsedJson);
+      };
+      reader.readAsArrayBuffer(file);
+    } catch (error) {
+      console.error("Error parsing Excel file: ", error);
+    }
+  };
+
+  const fetchProducts = async () => {
+    const products = await getProducts();
+    const productsWithKeys: ProductAttributes[] = products.map(
+      (product: ProductAttributes, index: number) => ({
+        ...product,
+        key: index.toString(),
+      })
+    );
+    setProducts(productsWithKeys);
+    console.log(`Got products`, products);
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    if (fileList?.length) {
+      parseExcel(fileList);
+    }
+  }, [fileList]);
+
   return (
     <>
       <Upload {...props} accept=".xls,.xlsx">
         <Button icon={<UploadOutlined />}>Select Excel File</Button>
       </Upload>
-      <StyledTable />
+      <StyledTable products={products} />
       <Content style={contentStyle}>
         {fileList.length > 0 && (
           <Button
@@ -80,4 +134,4 @@ const StyledSelectButton: React.FC = () => {
   );
 };
 
-export default StyledSelectButton;
+export default Product;

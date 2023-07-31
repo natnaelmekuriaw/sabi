@@ -1,13 +1,12 @@
 import "./App.css";
-
-import StyledButton from "./components/Button/StyledButton";
 import Layout from "./components/layouts";
+import Product from "./components/Product";
 
 function App() {
   return (
     <div className="App">
       <Layout>
-        <StyledButton />
+        <Product />
       </Layout>
     </div>
   );

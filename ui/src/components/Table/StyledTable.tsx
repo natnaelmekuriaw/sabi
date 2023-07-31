@@ -1,28 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, InputNumber, Popconfirm, Table, Typography } from "antd";
 
-interface Item {
+// import { ProductAttributes } from "../../../types/types";
+
+interface ProductAttributes {
   key: string;
-  name: string;
-  age: number;
-  address: string;
+  itemNo: number;
+  description: string;
+  rate: number;
+  quantity: number;
+  amount: number;
 }
 
-const originData: Item[] = [];
-for (let i = 0; i < 5; i++) {
-  originData.push({
-    key: i.toString(),
-    name: `Edward ${i}`,
-    age: 32,
-    address: `London Park no. ${i}`,
-  });
+interface TableAttributes {
+  products: ProductAttributes[];
 }
+
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
   dataIndex: string;
   title: any;
   inputType: "number" | "text";
-  record: Item;
+  record: ProductAttributes;
   index: number;
   children: React.ReactNode;
 }
@@ -61,15 +60,23 @@ const EditableCell: React.FC<EditableCellProps> = ({
   );
 };
 
-const StyledTable: React.FC = () => {
+const StyledTable: React.FC<TableAttributes> = ({ products }) => {
   const [form] = Form.useForm();
-  const [data, setData] = useState(originData);
+  const [data, setData] = useState<ProductAttributes[]>([]);
+
   const [editingKey, setEditingKey] = useState("");
 
-  const isEditing = (record: Item) => record.key === editingKey;
+  const isEditing = (record: ProductAttributes) => record.key === editingKey;
 
-  const edit = (record: Partial<Item> & { key: React.Key }) => {
-    form.setFieldsValue({ name: "", age: "", address: "", ...record });
+  const edit = (record: Partial<ProductAttributes> & { key: React.Key }) => {
+    form.setFieldsValue({
+      itemNo: "",
+      description: "",
+      quantity: "",
+      rate: "",
+      amount: "",
+      ...record,
+    });
     setEditingKey(record.key);
   };
 
@@ -79,22 +86,27 @@ const StyledTable: React.FC = () => {
 
   const save = async (key: React.Key) => {
     try {
-      const row = (await form.validateFields()) as Item;
+      const row = (await form.validateFields()) as ProductAttributes;
 
-      const newData = [...data];
-      const index = newData.findIndex((item) => key === item.key);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row,
-        });
-        setData(newData);
-        setEditingKey("");
-      } else {
-        newData.push(row);
-        setData(newData);
-        setEditingKey("");
+      const newData: ProductAttributes[] = data;
+      if (newData?.length) {
+        alert(newData?.length);
+        const index = newData.findIndex(
+          (item: ProductAttributes) => key === item.key
+        );
+        if (index > -1) {
+          const item = newData[index];
+          newData.splice(index, 1, {
+            ...item,
+            ...row,
+          });
+          setData(newData);
+          setEditingKey("");
+        } else {
+          newData.push(row);
+          setData(newData);
+          setEditingKey("");
+        }
       }
     } catch (errInfo) {
       console.log("Validate Failed:", errInfo);
@@ -103,27 +115,39 @@ const StyledTable: React.FC = () => {
 
   const columns = [
     {
-      title: "name",
-      dataIndex: "name",
-      width: "25%",
+      title: "Item No",
+      dataIndex: "itemNo",
+      width: "10%",
       editable: true,
     },
     {
-      title: "age",
-      dataIndex: "age",
-      width: "15%",
-      editable: true,
-    },
-    {
-      title: "address",
-      dataIndex: "address",
+      title: "Description",
+      dataIndex: "description",
       width: "40%",
       editable: true,
     },
     {
-      title: "operation",
+      title: "Quantity",
+      dataIndex: "quantity",
+      width: "10%",
+      editable: true,
+    },
+    {
+      title: "Rate",
+      dataIndex: "rate",
+      width: "10%",
+      editable: true,
+    },
+    {
+      title: "Amount",
+      dataIndex: "amount",
+      width: "20%",
+      editable: true,
+    },
+    {
+      title: "Operation",
       dataIndex: "operation",
-      render: (_: any, record: Item) => {
+      render: (_: any, record: ProductAttributes) => {
         const editable = isEditing(record);
         return editable ? (
           <span>
@@ -138,12 +162,22 @@ const StyledTable: React.FC = () => {
             </Popconfirm>
           </span>
         ) : (
-          <Typography.Link
-            disabled={editingKey !== ""}
-            onClick={() => edit(record)}
-          >
-            Edit
-          </Typography.Link>
+          <>
+            <Typography.Link
+              disabled={editingKey !== ""}
+              onClick={() => edit(record)}
+              style={{ marginRight: 8 }}
+            >
+              Edit
+            </Typography.Link>
+            <Typography.Link
+              disabled={editingKey !== ""}
+              onClick={() => edit(record)}
+              style={{ color: "#F87462" }}
+            >
+              Delete
+            </Typography.Link>
+          </>
         );
       },
     },
@@ -155,7 +189,7 @@ const StyledTable: React.FC = () => {
     }
     return {
       ...col,
-      onCell: (record: Item) => ({
+      onCell: (record: ProductAttributes) => ({
         record,
         inputType: col.dataIndex === "age" ? "number" : "text",
         dataIndex: col.dataIndex,
@@ -165,6 +199,10 @@ const StyledTable: React.FC = () => {
     };
   });
 
+  useEffect(() => {
+    setData(products);
+    console.log("In table component", data, products);
+  }, [data, products]);
   return (
     <Form form={form} component={false}>
       <Table
