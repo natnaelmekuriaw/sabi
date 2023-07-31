@@ -9,7 +9,11 @@ import {
   message,
 } from "antd";
 
-import { updateProduct } from "../../actions/product/productServices";
+import {
+  updateProduct,
+  deleteProduct,
+  getProducts,
+} from "../../actions/product/productServices";
 
 interface ProductAttributes {
   id: number;
@@ -74,6 +78,7 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
   const [data, setData] = useState<ProductAttributes[]>([]);
 
   const [editingKey, setEditingKey] = useState("");
+  const [deleteKey, setDeleteKey] = useState("");
 
   const isEditing = (record: ProductAttributes) => record.key === editingKey;
 
@@ -93,6 +98,7 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
 
   const cancel = () => {
     setEditingKey("");
+    setDeleteKey("");
   };
 
   const save = async (
@@ -109,7 +115,6 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
           (item: ProductAttributes) => key === item.key
         );
         if (index > -1) {
-          alert("yaya");
           const item = newData[index];
           newData.splice(index, 1, {
             ...item,
@@ -129,6 +134,49 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
           setData(newData);
           setEditingKey("");
         }
+      }
+    } catch (errInfo) {
+      console.log("Validate Failed:", errInfo);
+    }
+  };
+
+  const deleteRow = async (
+    record: Partial<ProductAttributes> & { key: React.Key }
+  ) => {
+    const key = record.key;
+    try {
+      const row = (await form.validateFields()) as ProductAttributes;
+
+      const newData: ProductAttributes[] = data;
+
+      const index = newData.findIndex(
+        (item: ProductAttributes) => key === item.key
+      );
+      if (index > -1) {
+        const item = newData[index];
+        newData.splice(index, 1, {
+          ...item,
+          ...row,
+        });
+        const deleteData = await deleteProduct(newData[index]);
+        console.log("got delete table", deleteData);
+        if (deleteData) {
+          console.log("got response delete row", deleteData);
+          const products = await getProducts();
+          const productsWithKeys: ProductAttributes[] = products.map(
+            (product: ProductAttributes, index: number) => ({
+              ...product,
+              key: index.toString(),
+            })
+          );
+          setData(productsWithKeys);
+          setEditingKey("");
+          message.success("row deleted successfully.");
+        } else message.error("failed to delete row ");
+      } else {
+        newData.push(row);
+        setData(newData);
+        setEditingKey("");
       }
     } catch (errInfo) {
       console.log("Validate Failed:", errInfo);
@@ -178,34 +226,39 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
       dataIndex: "operation",
       render: (_: any, record: ProductAttributes) => {
         const editable = isEditing(record);
-        return editable ? (
-          <span>
-            <Typography.Link
-              onClick={() => save(record)}
-              style={{ marginRight: 8 }}
-            >
-              Save
-            </Typography.Link>
-            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-              <a>Cancel</a>
-            </Popconfirm>
-          </span>
-        ) : (
+        return (
           <>
-            <Typography.Link
-              disabled={editingKey !== ""}
-              onClick={() => edit(record)}
-              style={{ marginRight: 8 }}
-            >
-              Edit
-            </Typography.Link>
-            <Typography.Link
-              disabled={editingKey !== ""}
-              onClick={() => edit(record)}
-              style={{ color: "#F87462" }}
-            >
-              Delete
-            </Typography.Link>
+            {editable ? (
+              <span>
+                <Typography.Link
+                  onClick={() => save(record)}
+                  style={{ marginRight: 8 }}
+                >
+                  Save
+                </Typography.Link>
+                <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+                  <a>Cancel</a>
+                </Popconfirm>
+              </span>
+            ) : (
+              <>
+                <Typography.Link
+                  disabled={editingKey !== ""}
+                  onClick={() => edit(record)}
+                  style={{ marginRight: 8 }}
+                >
+                  Edit
+                </Typography.Link>
+              </>
+            )}
+            <span>
+              <Popconfirm
+                title="Sure to Delete?"
+                onConfirm={() => deleteRow(record)}
+              >
+                <a style={{ color: "#f87462" }}>Delete</a>
+              </Popconfirm>
+            </span>
           </>
         );
       },

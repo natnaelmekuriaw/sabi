@@ -59,7 +59,7 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             res.status(400).json("Product can not be found");
     }
     catch (err) {
-        res.status(500).json("failed to delete product");
+        res.status(500).json("failed to update product");
     }
 });
 exports.updateProduct = updateProduct;
@@ -71,8 +71,9 @@ const removeProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 id: productId,
             },
         });
+        const products = yield product_model_1.default.findAll();
         if (newProduct)
-            res.status(200).json("Product deleted successfully");
+            res.status(200).json(products);
         else
             res.status(400).json("Product can not be found");
     }

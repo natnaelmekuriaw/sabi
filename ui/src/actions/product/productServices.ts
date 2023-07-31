@@ -30,3 +30,16 @@ export const updateProduct = async (product: ProductAttributes) => {
     return false;
   }
 };
+
+export const deleteProduct = async (product: ProductAttributes) => {
+  console.log("try delete", product);
+  try {
+    const response = await axios.delete(`${BaseUrl()}/products/${product?.id}`);
+
+    console.log("got delete response", response);
+    return response.data;
+  } catch (error) {
+    console.log("got delete error", `${BaseUrl()}/products`, error);
+    return false;
+  }
+};
