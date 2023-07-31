@@ -10,8 +10,6 @@ TechStack: React (Using TypeScript), Node(Using TypeScript), Mysql,Express, AntD
 
 ![Screenshot from 2023-08-01 00-30-22](https://github.com/natnaelmekuriaw/sabi/assets/45584844/c2f5553e-b5e3-4424-b0d7-bfe1588c83be)#
 ![Uploading Screenshot from 2023-08-01 00-30-14.png…]()
-
-
 ![Uploading Screenshot from 2023-08-01 00-30-07.png…]()
 ![Screenshot from 2023-08-01 00-29-56](https://github.com/natnaelmekuriaw/sabi/assets/45584844/f2505ade-6751-4390-b1af-ce5a3c9ec7de)
 ![Screenshot from 2023-08-01 00-28-42](https://github.com/natnaelmekuriaw/sabi/assets/45584844/99221310-971c-44e9-828b-95393fd345e1)
