@@ -84,7 +84,6 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
   const isEditing = (record: ProductAttributes) => record.key === editingKey;
 
   const edit = (record: Partial<ProductAttributes> & { key: React.Key }) => {
-    console.log("Editing", record);
     form.setFieldsValue({
       id: "",
       itemNo: "",
