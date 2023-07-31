@@ -6,6 +6,7 @@ class Product extends Model<ProductAttributes> implements ProductAttributes {
   public id!: number;
   public itemNo!: number;
   public description!: string;
+  public rate!: number;
   public quantity!: number;
   public amount!: number;
 
@@ -23,6 +24,10 @@ class Product extends Model<ProductAttributes> implements ProductAttributes {
         },
         description: {
           type: DataTypes.STRING,
+          allowNull: true,
+        },
+        rate: {
+          type: DataTypes.FLOAT,
           allowNull: true,
         },
         quantity: {

@@ -21,6 +21,10 @@ class Product extends sequelize_1.Model {
                 type: sequelize_1.DataTypes.STRING,
                 allowNull: true,
             },
+            rate: {
+                type: sequelize_1.DataTypes.FLOAT,
+                allowNull: true,
+            },
             quantity: {
                 type: sequelize_1.DataTypes.INTEGER,
                 allowNull: true,

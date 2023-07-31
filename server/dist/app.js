@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const cors_1 = __importDefault(require("cors"));
 const productRoutes_1 = __importDefault(require("./src/routes/productRoutes"));
 const db_config_1 = __importDefault(require("./config/db.config"));
 dotenv_1.default.config();
@@ -23,6 +24,7 @@ const PORT = process.env.PORT;
     try {
         yield db_config_1.default.authenticate();
         yield db_config_1.default.sync();
+        app.use((0, cors_1.default)());
         app.use(express_1.default.json());
         app.use("/products", productRoutes_1.default);
         app.listen(PORT, () => {
