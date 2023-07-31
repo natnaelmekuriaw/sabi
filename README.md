@@ -6,6 +6,8 @@
    delete single row
    
 TechStack: React (Using TypeScript), Node(Using TypeScript), Mysql,Express, AntDesign, sequelize.implmented MVC architecture.
+
+Visit my portfolio for information about my recent projects and tech stacks at https://natnael-portfolio.vercel.app/
    
 
 ![Screenshot from 2023-08-01 00-30-22](https://github.com/natnaelmekuriaw/sabi/assets/45584844/c2f5553e-b5e3-4424-b0d7-bfe1588c83be)#
