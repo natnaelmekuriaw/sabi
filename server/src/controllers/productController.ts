@@ -79,14 +79,15 @@ export const addProduct = async (req: Request, res: Response) => {
 export const addMultipleProduct = async (req: Request, res: Response) => {
   const data = req.body;
   if (data.massData.length > 0) {
-    const products = data.massData;
-    products.forEach(async (product: ProductAttributes) => {
-      try {
-        const newProduct = await Product.upsert(product);
-      } catch (err) {
-        // res.status(500).json("failed to add new product");
-      }
-    });
+    try {
+      const products = data.massData;
+      const productsMass = products.map((product: ProductAttributes) =>
+        Product.upsert(product)
+      );
+      await Promise.all(productsMass);
+    } catch (err) {
+      // res.status(500).json("failed to add new product");
+    }
     const allProducts = await Product.findAll();
     res.status(201).json(allProducts);
   }

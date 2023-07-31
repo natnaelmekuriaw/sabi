@@ -96,15 +96,14 @@ exports.addProduct = addProduct;
 const addMultipleProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const data = req.body;
     if (data.massData.length > 0) {
-        const products = data.massData;
-        products.forEach((product) => __awaiter(void 0, void 0, void 0, function* () {
-            try {
-                const newProduct = yield product_model_1.default.upsert(product);
-            }
-            catch (err) {
-                // res.status(500).json("failed to add new product");
-            }
-        }));
+        try {
+            const products = data.massData;
+            const productsMass = products.map((product) => product_model_1.default.upsert(product));
+            yield Promise.all(productsMass);
+        }
+        catch (err) {
+            // res.status(500).json("failed to add new product");
+        }
         const allProducts = yield product_model_1.default.findAll();
         res.status(201).json(allProducts);
     }

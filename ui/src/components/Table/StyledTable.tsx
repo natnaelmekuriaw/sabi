@@ -159,7 +159,6 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
           ...row,
         });
         const deleteData = await deleteProduct(newData[index]);
-        console.log("got delete table", deleteData);
         if (deleteData) {
           console.log("got response delete row", deleteData);
           const products = await getProducts();
@@ -169,6 +168,7 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
               key: index.toString(),
             })
           );
+          console.log("got delete table", deleteData, productsWithKeys);
           setData(productsWithKeys);
           setEditingKey("");
           message.success("row deleted successfully.");
@@ -283,8 +283,7 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
 
   useEffect(() => {
     setData(products);
-    console.log("In table component", data, products);
-  }, [data, products]);
+  }, [products]);
   return (
     <Form form={form} component={false}>
       <Table
