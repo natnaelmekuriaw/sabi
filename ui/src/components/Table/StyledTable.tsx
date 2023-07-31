@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, InputNumber, Popconfirm, Table, Typography } from "antd";
+import {
+  Form,
+  Input,
+  InputNumber,
+  Popconfirm,
+  Table,
+  Typography,
+  message,
+} from "antd";
 
-// import { ProductAttributes } from "../../../types/types";
+import { updateProduct } from "../../actions/product/productServices";
 
 interface ProductAttributes {
+  id: number;
   key: string;
   itemNo: number;
   description: string;
@@ -69,7 +78,9 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
   const isEditing = (record: ProductAttributes) => record.key === editingKey;
 
   const edit = (record: Partial<ProductAttributes> & { key: React.Key }) => {
+    console.log("Editing", record);
     form.setFieldsValue({
+      id: "",
       itemNo: "",
       description: "",
       quantity: "",
@@ -84,24 +95,35 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
     setEditingKey("");
   };
 
-  const save = async (key: React.Key) => {
+  const save = async (
+    record: Partial<ProductAttributes> & { key: React.Key }
+  ) => {
+    const key = record.key;
     try {
       const row = (await form.validateFields()) as ProductAttributes;
 
+      console.log("got edit data is ", record);
       const newData: ProductAttributes[] = data;
       if (newData?.length) {
-        alert(newData?.length);
         const index = newData.findIndex(
           (item: ProductAttributes) => key === item.key
         );
         if (index > -1) {
+          alert("yaya");
           const item = newData[index];
           newData.splice(index, 1, {
             ...item,
             ...row,
           });
-          setData(newData);
-          setEditingKey("");
+          console.log("here updated", newData[index]);
+          const update = await updateProduct(newData[index]);
+          console.log("got update table", update);
+          // setData(newData);
+          if (update) {
+            setData([]);
+            setEditingKey("");
+            message.success("row updated successfully.");
+          } else message.error("failed to update row ");
         } else {
           newData.push(row);
           setData(newData);
@@ -114,6 +136,13 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
   };
 
   const columns = [
+    // {
+    //   title: "Id",
+    //   dataIndex: "id",
+    //   width: "5%",
+    //   hidden: true,
+    //   render: () => null,
+    // },
     {
       title: "Item No",
       dataIndex: "itemNo",
@@ -152,7 +181,7 @@ const StyledTable: React.FC<TableAttributes> = ({ products }) => {
         return editable ? (
           <span>
             <Typography.Link
-              onClick={() => save(record.key)}
+              onClick={() => save(record)}
               style={{ marginRight: 8 }}
             >
               Save

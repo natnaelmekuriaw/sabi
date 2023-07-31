@@ -1,4 +1,5 @@
 export interface ProductAttributes {
+  id: number;
   key: string;
   itemNo: number;
   description: string;
