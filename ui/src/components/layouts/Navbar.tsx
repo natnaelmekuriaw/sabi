@@ -11,7 +11,7 @@ export default function Navbar() {
           const key = index + 1;
           return {
             key,
-            label: `SSSS Project`,
+            label: `Sabi Project`,
           };
         })}
       />
